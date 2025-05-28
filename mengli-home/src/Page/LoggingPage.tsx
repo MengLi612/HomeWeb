@@ -44,6 +44,7 @@ const data: TimeItem[] = [
         <Typography>添加气泡按钮的外观和效果（初步）</Typography>
         <Typography>添加网站博客页面打开时的动画效果（暂定）</Typography>
         <Typography>优化顶部菜单的隐藏动画效果（暂定）</Typography>
+        <Typography>项目启用git进行版本控制，并创建Github仓库</Typography>
       </>
     ),
   },
