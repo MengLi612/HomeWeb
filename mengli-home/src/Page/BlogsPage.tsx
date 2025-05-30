@@ -6,54 +6,62 @@ import {
   GithubOutlined,
   CodeSandboxOutlined,
 } from "@ant-design/icons";
-import { Avatar, Button, Card, Flex, List, Tabs } from "antd";
+import { Avatar, Button, Card, Col, Divider, Empty, Flex, Input, Popover, Row, Select, Tabs, Typography, Upload } from "antd";
 import type { TabsProps } from "antd";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { Layer } from "../Layer";
+import LeaveBlankSpace from "../CustomJSX/LeaveBlankSpace";
+import { WindowStateContext } from "../Context/WindowStateContext";
 
-interface BlogItem {
+interface BlogData {
   img?: React.ReactNode;
-  title: string;
-  description: string;
+  title: React.ReactNode;
+  description?: React.ReactNode;
+  link: string;
   theme?: string;
-  tag?: string[];
+  tags?: string[];
 }
 
-const data: BlogItem[] = [
+interface BlogItemProps {
+  img?: React.ReactNode;
+  title: React.ReactNode;
+  description?: React.ReactNode;
+  link: string;
+  theme?: string;
+  tags?: string[];
+}
+
+export function BlogComponent({ img, title, description, link, theme, tags }: BlogItemProps) {
+  return (
+    <>
+      <div style={{}}>
+        <Row>
+          <Col style={{ aspectRatio: "1 / 1", alignItems: "center", justifyContent: "center" }}>{img}</Col>
+          <LeaveBlankSpace width={20}></LeaveBlankSpace>
+          <Col flex={1} style={{alignContent: "center"}}>
+            <Flex vertical={true}>
+              <a href={link}>{title}</a>
+              {description}
+              <Flex vertical={false} align="center">
+                {theme}
+                {tags}
+              </Flex>
+            </Flex>
+          </Col>
+        </Row>
+      </div>
+    </>
+  );
+}
+
+const data: BlogData[] = [
   {
+    img:<GithubOutlined style={{fontSize: "64px"}}/>,
     title: "Ant Design Title 1",
     description: "Ant Design Description 1",
+    link: "/mengli-home/public/MDFile/test.md",
     theme: "Github",
-    tag: ["React", "Ant Design", "UI"],
-  },
-  {
-    title: "Ant Design Title 2",
-    description: "Ant Design Description 2",
-    theme: "Unity",
-  },
-  {
-    title: "Ant Design Title 3",
-    description: "Ant Design Description 3",
-    theme: "Github",
-  },
-  {
-    title: "Ant Design Title 4",
-    description: "Ant Design Description 4",
-    theme: "Github",
-  },
-  {
-    title: "Ant Design Title 5",
-    description: "Ant Design Description 5",
-    theme: "Unity",
-  },
-  {
-    title: "Ant Design Title 6",
-    description: "Ant Design Description 6",
-    theme: "Unity",
-  },
-  {
-    title: "Ant Design Title 7",
-    description: "Ant Design Description 7",
-    theme: "Unity",
+    tags: ["React", "Ant Design", "UI"],
   },
 ];
 
@@ -72,35 +80,20 @@ const tabItems: TabsProps["items"] = [
   },
 ];
 
-interface BlankSpaceProps {
-  height?: number;
-  width?: number;
-  children?: React.ReactNode;
-}
-
-function LeaveBlankSpace({
-  height = 100,
-  width = 0,
-  children,
-}: BlankSpaceProps) {
-  return (
-    <>
-      <div className="blank-space" style={{ height: height, width: width }}>
-        {children}
-      </div>
-    </>
-  );
-}
-
 interface ComponentContainerProps {
   className?: string;
   id?: string;
   style?: React.CSSProperties;
-  
+
   children?: React.ReactNode;
 }
 
-function ComponentContainer({ className, id, style, children }: ComponentContainerProps) {
+function ComponentContainer({
+  className,
+  id,
+  style,
+  children,
+}: ComponentContainerProps) {
   return (
     <div className={className} id={id} style={style}>
       {children}
@@ -108,12 +101,12 @@ function ComponentContainer({ className, id, style, children }: ComponentContain
   );
 }
 
-
 export default function BlogsPage() {
   const [selectedTheme, setSelectedTheme] = useState<string | null>(null);
 
   const [pageScale, setPageScale] = useState(0.1);
 
+  const [showAddBlogComponent, setShowAddBlogComponent] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -129,7 +122,34 @@ export default function BlogsPage() {
 
   return (
     <>
-      <div style={{ height: "100%", width: "100%", transition: "all 0.2s", transform: `scale(${pageScale})` }}>
+      <div
+        style={{
+          height: "100%",
+          width: "100%",
+          transition: "all 0.2s",
+          transform: `scale(${pageScale})`,
+        }}
+      >
+        {showAddBlogComponent && (
+          <Layer
+            zIndex={10}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "rgba(60, 75, 118, 0.25)",
+            }}
+          >
+            <WindowStateContext.Provider
+              value={{
+                windowStateId: showAddBlogComponent,
+                setWindowStateId: setShowAddBlogComponent,
+              }}
+            >
+              <BlogAddCard />
+            </WindowStateContext.Provider>
+          </Layer>
+        )}
         <LeaveBlankSpace height={120} />
         <Flex vertical={false} gap={10}>
           <Flex vertical={true} gap={10}>
@@ -152,7 +172,20 @@ export default function BlogsPage() {
                 <text>欢迎来到我的个人主页</text>
               </Flex>
               <Flex justify="center">
-                <GithubFilled style={{ color: "black", fontSize: "30px" }} />
+                <Popover
+                  placement={"bottom"}
+                  trigger={"hover"}
+                  content="https://github.com/MengLi612/HomeWeb"
+                >
+                  <a
+                    href="https://github.com/MengLi612/HomeWeb"
+                    target="_blank"
+                  >
+                    <GithubFilled
+                      style={{ color: "black", fontSize: "30px" }}
+                    />
+                  </a>
+                </Popover>
                 <BilibiliFilled
                   style={{
                     color: "rgba(255, 0, 144, 0.8)",
@@ -163,7 +196,13 @@ export default function BlogsPage() {
             </Card>
 
             <Card title="工具栏" size="small">
-              <Button>撰写新博客</Button>
+              <Button
+                onClick={() => {
+                  setShowAddBlogComponent(true);
+                }}
+              >
+                撰写新博客
+              </Button>
             </Card>
           </Flex>
 
@@ -189,17 +228,10 @@ export default function BlogsPage() {
                 }}
               >
                 <List
-                  itemLayout="horizontal"
-                  dataSource={filteredDataFromTheme}
-                  renderItem={(item) => (
-                    <List.Item>
-                      <List.Item.Meta
-                        title={item.title}
-                        description={item.description}
-                      />
-                    </List.Item>
-                  )}
+                  itemsData={filteredDataFromTheme}
+                  Component={BlogComponent}
                 />
+                <Empty />
               </Flex>
               <Tabs
                 size="small"
@@ -216,6 +248,73 @@ export default function BlogsPage() {
           </ComponentContainer>
         </Flex>
       </div>
+    </>
+  );
+}
+
+function BlogAddCard() {
+  const { setWindowStateId } = useContext(WindowStateContext);
+
+  return <Card>
+    <Row>
+      <Col
+        span={24}
+        style={{ display: "flex", justifyContent: "center" }}
+      >
+        <Upload>
+          <Button>点击上传（.md）</Button>
+        </Upload>
+      </Col>
+    </Row>
+    <Divider plain orientation="left" style={{ borderColor: "rgba(0, 0, 0, 0.5)" }}>属性</Divider>
+    <Row justify={"center"} align={"middle"}>
+      <Col span={4}>
+        <Typography>标题</Typography>
+      </Col>
+      <Col span={20}>
+        <Input placeholder={"默认为文件名称"}></Input>
+      </Col>
+    </Row>
+    <Row>
+      <Col span={24}>
+        <Typography>Tags</Typography>
+      </Col>
+    </Row>
+    <Row>
+      <Col span={24}>
+        <Select mode="multiple" style={{ width: "100%" }}></Select>
+      </Col>
+    </Row>
+    <Divider />
+    <Row>
+      <Col
+        span={24}
+        style={{ display: "flex", justifyContent: "center" }}
+      >
+        <Button onClick={() => {setWindowStateId(false)}}>
+          添加
+        </Button>
+      </Col>
+    </Row>
+  </Card>;
+}
+
+
+
+
+type ListProps<T> = {
+  itemsData: T[];
+  Component: React.FC<T>;
+};
+
+export function List<T>({ itemsData, Component }: ListProps<T>) {
+  return (
+    <>
+      <Flex vertical={true}>
+        {itemsData.map((itemsData, index) => (
+          <Component key={index} {...itemsData} />
+        ))}
+      </Flex>
     </>
   );
 }
