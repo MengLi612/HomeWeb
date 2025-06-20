@@ -5,12 +5,12 @@ export function Layer({
   style,
 }: {
   children?: React.ReactNode;
-    zIndex?: number;
+  zIndex?: number;
   id?: string;
   style?: React.CSSProperties;
 }) {
   return (
-    <div 
+    <div
       className="layer"
       id={id}
       style={{

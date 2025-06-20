@@ -36,6 +36,4 @@ export default function PageMapper() {
     default:
       break;
   }
-
-  return <></>;
 }

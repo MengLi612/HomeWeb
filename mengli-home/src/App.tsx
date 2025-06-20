@@ -4,6 +4,10 @@ import backgroundImage from "./assets/168689.webp";
 import { Layer } from "./Layer";
 import WebBookView from "./WebLink/WebBookView";
 import { FeedbackContext } from "./Context/Feedback";
+import MouseFollowerRingLayer from "./Component/Layer/MouseFollowerRingLayer";
+import FrostedGlassLayer from "./Component/Layer/FrostedGlassLayer";
+import { RainBackgroundLayer } from "./Component/Layer/RainBackgroundLayer";
+import { BackgroundImageLayer } from "./Component/Layer/BackgroundImageLayer";
 
 function App() {
   const [messageApi, messageContextHolder] = message.useMessage();
@@ -29,7 +33,17 @@ function App() {
         </FeedbackContext.Provider>
       </Layer>
       <Layer zIndex={-1} id="BackgroundLayer">
-        <BackgroundImage imgURL={backgroundImage} />
+        <Layer zIndex={100} id="MouseFollowerLayer">
+          <MouseFollowerRingLayer />
+        </Layer>
+        <Layer zIndex={50} id="FrostedGlassLayer">
+          <FrostedGlassLayer />
+        </Layer>
+        <Layer zIndex={30} id="RainBackgroundLayer">
+          <RainBackgroundLayer numDrops={100} />
+        </Layer>
+        {/* <GradientBackground /> */}
+        <BackgroundImageLayer imgURL={backgroundImage} />
       </Layer>
     </>
   );
@@ -37,20 +51,3 @@ function App() {
 
 export default App;
 
-function BackgroundImage({ imgURL }: { imgURL?: string }) {
-  return (
-    <img
-      src={imgURL}
-      alt="Background"
-      style={{
-        width: "100%",
-        height: "100%",
-        objectFit: "cover",
-        objectPosition: "center",
-        position: "absolute",
-        top: 0,
-        left: 0,
-      }}
-    />
-  );
-}

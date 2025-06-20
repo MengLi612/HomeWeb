@@ -1,90 +1,25 @@
 import { DownOutlined } from "@ant-design/icons";
-import { Splitter, Tree, Flex, type TreeDataNode, Tag } from "antd";
-import { List } from "./BlogsPage";
+import { Splitter, Tree, Flex, type TreeDataNode } from "antd";
+import { componentData } from "../Data/componentData";
+import ComponentItem from "../Component/ComponentItem";
+import List from "../Component/Type/List";
+import { componentThemeData } from "../Data/componentThemeData";
 
-interface ComponentThemeType {
-  value: string;
-  label: string;
-}
+const componentTreeItem: TreeDataNode[] = [];
 
-const theme: ComponentThemeType[] = [
-  {
-    value: "数据显示",
-    label: "数据显示",
-  },
-  {
-    value: "布局",
-    label: "布局",
-  },
-];
-
-interface ComponentsItemType {
-  value: string;
-  label: string;
-  theme: string;
-  tags: string[];
-}
-
-const components: ComponentsItemType[] = [
-  {
-    value: "CodeBox",
-    label: "CodeBox",
-    theme: "数据显示",
-    tags: ["附加组件", "数据显示", "Code"],
-  },
-  {
-    value: "List",
-    label: "List",
-    theme: "布局",
-    tags: ["常规组件", "多项", "数据显示"],
-  },
-  {
-    value: "CodeBox",
-    label: "CodeBox",
-    theme: "数据显示",
-    tags: ["附加组件"],
-  },
-  {
-    value: "CodeBox",
-    label: "CodeBox",
-    theme: "数据显示",
-    tags: ["附加组件"],
-  },
-];
-
-function ComponentItem({ label, tags }: ComponentsItemType) {
-  return (
-    <div
-      style={{
-        height: "200px",
-        width: "200px",
-        borderRadius: "5px",
-        border: "1px solid black",
-      }}
-    >
-      <h3>{label}</h3>
-      {tags.map((tag) => (
-        <Tag>{tag}</Tag>
-      ))}
-    </div>
-  );
-}
-
-const treeData: TreeDataNode[] = [];
-
-for (let i = 0; i < theme.length; i++) {
+for (let i = 0; i < componentThemeData.length; i++) {
   const children: TreeDataNode[] = [];
-  for (let j = 0; j < components.length; j++) {
-    if (components[j].theme === theme[i].value) {
+  for (let j = 0; j < componentData.length; j++) {
+    if (componentData[j].theme === componentThemeData[i].value) {
       children.push({
-        title: components[j].label,
-        key: components[j].value,
+        title: componentData[j].label,
+        key: componentData[j].value,
       });
     }
   }
-  treeData.push({
-    title: theme[i].label,
-    key: theme[i].value,
+  componentTreeItem.push({
+    title: componentThemeData[i].label,
+    key: componentThemeData[i].value,
     children: children,
   });
 }
@@ -110,7 +45,7 @@ export default function ComponentsPage() {
             <Tree
               showLine
               switcherIcon={<DownOutlined />}
-              treeData={treeData}
+              treeData={componentTreeItem}
             />
           </div>
         </Splitter.Panel>
@@ -129,7 +64,7 @@ export default function ComponentsPage() {
             justify="space-evenly"
             style={{ gap: "30px 0", width: "100%" }}
           >
-            <List itemsData={components} Component={ComponentItem}></List>
+            <List itemsData={componentData} Component={ComponentItem}></List>
           </Flex>
         </Splitter.Panel>
       </Splitter>

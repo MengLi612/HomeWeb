@@ -74,6 +74,21 @@ const data: TimeItem[] = [
       </>
     ),
   },
+  {
+    label: <div id="2025-06-20">2025-06-20</div>,
+    children: (
+      <>
+        <Typography>优化背景层的相关视觉效果（初步），并添加一些效果图层</Typography>
+        <Typography>博客页添加了一些测试博客项，修改了添加博客页的测试功能，现在不上传文件也能添加博客项</Typography>
+        <Typography>
+          优化源文件的结构，整理了源文件的目录结构，添加了一些注释
+        </Typography>
+        <Typography>优化一些其他的功能</Typography>
+        <Typography>现在我又回来建设我的网站了</Typography>
+        <Typography>ヾ(≧▽≦*)o</Typography>
+      </>
+    ),
+  },
 ];
 
 
@@ -126,7 +141,7 @@ export default function LoggingPage() {
             }}
           >
             <div style={{ height: "50px" }}></div>
-            <Timeline mode="left" items={data} reverse pending="Recording..." />
+            <Timeline mode="left" items={data} reverse pending="Recording..." style={{ position: "relative", left: "-400px" }} />
           </Splitter.Panel>
         </Splitter>
       </Flex>

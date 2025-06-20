@@ -2,9 +2,10 @@ import { useContext, useState } from "react";
 import { PageContext } from "../../Context/PageContext";
 import { Button, Flex, Menu } from "antd";
 import { CaretUpOutlined } from "@ant-design/icons";
+import { menuItemData } from "../../Data/menuItemData";
 
 export default function MainBookMenu() {
-  const { setPageId } = useContext(PageContext);
+  const { pageId, setPageId } = useContext(PageContext);
 
   const [isHidden, setIsHidden] = useState(false);
 
@@ -23,20 +24,14 @@ export default function MainBookMenu() {
           // height: isHidden ? "0px" : "auto",
         }}
       >
-        <Menu mode="horizontal">
-          <Menu.Item key="1" onClick={() => setPageId("main-page")}>
-            主页
-          </Menu.Item>
-          <Menu.Item key="2" onClick={() => setPageId("blogs-page")}>
-            博客
-          </Menu.Item>
-          <Menu.Item key="3" onClick={() => setPageId("components-page")}>
-            组件
-          </Menu.Item>
-          <Menu.Item key="4" onClick={() => setPageId("logging-page")}>
-            日志
-          </Menu.Item>
-        </Menu>
+        <Menu
+          mode="horizontal"
+          selectedKeys={[pageId]}
+          items={menuItemData}
+          onClick={(e) => {
+            setPageId(e.key);
+          }}
+        />
       </div>
       <div style={{ width: "20px" }}></div>
       <Button

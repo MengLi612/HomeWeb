@@ -1,5 +1,5 @@
 import { Layout } from "antd";
-import { Header, Content } from "antd/es/layout/layout";
+import { Header, Content, Footer } from "antd/es/layout/layout";
 import { useState } from "react";
 import { Layer } from "../Layer";
 import PageMapper from "../WebLink/PageMapper";
@@ -40,15 +40,17 @@ export default function MainBook() {
           </PageContext.Provider>
         </Content>
 
-        <footer
+        <Footer
           style={{
-            height: "40px",
+            height: "10px",
             backgroundColor: "rgba(255, 255, 255, 0.27)",
             textAlign: "center",
           }}
         >
-          Footer
-        </footer>
+          <div style={{ color: "white" }}>
+            © 2023 Mengli Home. All rights reserved.
+          </div>
+        </Footer>
       </Layout>
     </Layer>
   );
