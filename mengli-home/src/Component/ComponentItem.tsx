@@ -1,5 +1,5 @@
 import { Tag } from "antd";
-import type { IComponentsItem } from "../Page/ComponentsPage";
+import type { IComponentsItem } from "../Interface/IComponentsItem";
 
 export default function ComponentItem({ label, tags }: IComponentsItem) {
   return (
