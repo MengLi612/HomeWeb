@@ -4,17 +4,9 @@ import {
   GithubFilled,
   BilibiliFilled,
 } from "@ant-design/icons";
-import {
-  Avatar,
-  Button,
-  Card,
-  Empty,
-  Flex,
-  Popover,
-  Tabs,
-} from "antd";
+import { Avatar, Button, Card, Empty, Flex, Popover, Tabs } from "antd";
 import type { TabsProps } from "antd";
-import { useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { Layer } from "../Layer";
 import LeaveBlankSpace from "../CustomJSX/LeaveBlankSpace";
 import { WindowStateContext } from "../Context/WindowStateContext";
@@ -57,12 +49,35 @@ for (let i = 0; i < blogThemeData.length + 2; i++) {
   }
 }
 
+type ScrollState = "expanding" | "scrolling";
+
 export default function BlogsPage() {
+  // 博客列表主题切换
   const [selectedTheme, setSelectedTheme] = useState<string | null>(null);
-
+  // 动画效果：页面打开时的缩放状态
   const [pageScale, setPageScale] = useState(0.1);
-
+  // 是否显示添加博客组件
   const [showAddBlogComponent, setShowAddBlogComponent] = useState(false);
+
+  //#region 当上划滚动栏时，首先减少留白空间高度，直到达到最小值，然后开始滚动
+  // 滚动状态，初始为 expanding
+  const [scrollState, setScrollState] = useState<ScrollState>("expanding");
+  // 留白空间高度，初始为 120px
+  // 当滚动状态为 expanding 时，上划时留白空间高度会逐渐减少
+  const leaveBlankSpaceMaxHeight = 120; // 留白空间的最大高度
+  const [leaveBlankSpaceHeight, setLeaveBlankSpaceHeight] = useState(
+    leaveBlankSpaceMaxHeight
+  );
+  const targetLength = useRef(0); // 用于记录滚动的总高度
+  const animationRef = useRef<number | null>(null);
+  const SPRING_SPEED = 0.1; // 留白空间高度减少的速度
+
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  //#endregion
+
+
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -71,6 +86,47 @@ export default function BlogsPage() {
 
     return () => clearTimeout(timer);
   }, []);
+
+  const animate = useCallback(() => {
+    // 当120-leaveBlankSpaceHeight的值是留白空间高度减少的值，当减小的值小于targetLength时，会继续减少留白空间高度直到等于targetLength，并且像橡皮筋一样，差越大，速度越快
+    const distance = leaveBlankSpaceMaxHeight - leaveBlankSpaceHeight;
+    const delta = (distance - targetLength.current) * SPRING_SPEED;
+    setLeaveBlankSpaceHeight((prevHeight) => {
+      const newHeight = delta - prevHeight;
+      if (newHeight <= 0) {
+        cancelAnimationFrame(animationRef.current!);
+        return 0; // 确保高度不会小于0
+      }
+      return newHeight;
+    });
+  }, [leaveBlankSpaceHeight, leaveBlankSpaceMaxHeight, SPRING_SPEED]);
+
+  useEffect(() => {
+    // 如果留白减少的高度小于scrollLength
+
+    const handleScroll = (event: WheelEvent) => {
+      if (scrollState === "expanding" && event.deltaY > 0) {
+        targetLength.current += event.deltaY; // 累加滚动距离
+        if (targetLength.current - leaveBlankSpaceHeight >= 0) {
+          animationRef.current = requestAnimationFrame(animate);
+        }
+        if (leaveBlankSpaceHeight - targetLength.current <= 0) {
+          setScrollState("scrolling");
+        }
+      }
+      else if (scrollState === "scrolling" && event.deltaY < 0 && scrollRef.current?.scrollTop === 0) {
+        setLeaveBlankSpaceHeight(leaveBlankSpaceMaxHeight);
+        targetLength.current = 0; // 重置滚动距离
+        setScrollState("expanding");
+      }
+    };
+
+    window.addEventListener("wheel", handleScroll, { passive: false });
+
+    return () => {
+      window.removeEventListener("wheel", handleScroll);
+    };
+  }, [scrollState, leaveBlankSpaceHeight, animate]);
 
   const filteredDataFromTheme = selectedTheme
     ? blogItemData.filter((item) => item.theme === selectedTheme)
@@ -84,6 +140,8 @@ export default function BlogsPage() {
           width: "100%",
           transition: "all 0.2s",
           transform: `scale(${pageScale})`,
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         {showAddBlogComponent && (
@@ -106,9 +164,14 @@ export default function BlogsPage() {
             </WindowStateContext.Provider>
           </Layer>
         )}
-        <LeaveBlankSpace height={120} />
-        <Flex vertical={false} gap={10} flex={1}>
-          <Flex vertical={true} gap={10} >
+        <LeaveBlankSpace
+          height={leaveBlankSpaceHeight}
+          style={{
+            transition: "all 0.2s",
+          }}
+        />
+        <Flex vertical={false} gap={10} flex={1} style={{ minHeight: 0 }}>
+          <Flex vertical={true} gap={10}>
             <Card hoverable={true}>
               <Avatar
                 shape="square"
@@ -172,13 +235,14 @@ export default function BlogsPage() {
           >
             <Flex vertical={false} align="center" style={{ height: "100%" }}>
               <Flex
+                ref={scrollRef}
                 vertical={true}
                 align="top"
                 justify="left"
                 style={{
-                  height: "420px",
+                  height: "100%",
                   width: "100%",
-                  overflowY: "auto",
+                  overflowY: scrollState === "scrolling" ? "auto" : "hidden",
                   scrollbarWidth: "thin",
                   paddingLeft: "16px",
                 }}
@@ -211,9 +275,3 @@ export default function BlogsPage() {
     </>
   );
 }
-
-
-
-
-
-

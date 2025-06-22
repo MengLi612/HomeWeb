@@ -88,10 +88,6 @@ export default function LoginPage() {
                     if (data.password === loginInputData.password) {
                       setSucceedLogin(true);
                       if (succeedLogin) {
-                        api?.message.open({
-                          type: "success",
-                          content: "登录成功",
-                        });
                         api?.notification.info({
                           message: "登录成功",
                           description: `欢迎回来，${data.userName}`,
@@ -104,6 +100,11 @@ export default function LoginPage() {
                       api?.message.open({
                         type: "error",
                         content: "密码错误",
+                      });
+                      api?.notification.error({
+                        message: "登录失败",
+                        description: "密码错误，请重试",
+                        placement: "bottomRight",
                       });
                     }
                   } else {
